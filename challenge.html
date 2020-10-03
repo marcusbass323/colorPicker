@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Picker</title>
+</head>
+
+<style>
+    body {
+        display: inline-block;
+        padding: 5px;
+    }
+
+    .bounce {
+        animation: bounce 2s ease infinite;
+        height: 25px;
+        width: 25px;
+        border-radius: 50%;
+        border: 1px solid red;
+        background-color: red;
+        margin-top: 20px;
+        margin-left: 5px;
+    }
+
+    @keyframes bounce {
+        70% {
+            transform: translateY(0%);
+        }
+
+        80% {
+            transform: translateY(-15%);
+        }
+
+        90% {
+            transform: translateY(0%);
+        }
+
+        95% {
+            transform: translateY(-7%);
+        }
+
+        97% {
+            transform: translateY(0%);
+        }
+
+        99% {
+            transform: translateY(-3%);
+        }
+
+        100% {
+            transform: translateY(0);
+        }
+    }
+
+    #colorHex {
+        margin-left: 5px;
+    }
+
+    #colorInfo {
+        display: flex;
+        flex-direction: row;
+    }
+
+    h1 {
+        font-size: 100px;
+    }
+
+    li {
+        border: 1px solid black;
+        margin: 5px;
+        width: 25px;
+        height: 25px;
+        list-style: none;
+    }
+
+    #list {
+        margin-left: -5px;
+    }
+
+    #Loading {
+        font-size: 50px;
+    }
+
+    #loadingContainer {
+        width: 100vw;
+        display: flex;
+        justify-content: center;
+        position: absolute;
+        margin-top: 20%;
+    }
+
+    #preview {
+        height: 90%;
+        display: flex;
+        justify-content: center;
+        text-align: center;
+    }
+
+    #previewContainer {
+        width: 48%;
+        height: 100vh;
+        position: fixed;
+        margin-left: 50%;
+        margin-top: 25px;
+    }
+
+    #previewText {
+        display: none;
+    }
+
+    ul {
+        list-style-type: none;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        width: 50vw;
+        cursor: pointer;
+        padding-left: 0;
+        margin-right: 0;
+        float: left;
+    }
+</style>
+
+<body id="body">
+    <div id="loadingContainer">
+        <div id="Loading">Please wait for colors to load</div>
+        <div class="bounce"></div>
+    </div>
+
+    <div>
+        <ul id="list"></ul>
+    </div>
+
+    <div id="previewContainer">
+        <div id="colorInfo">
+            <div id="previewTitle"></div>
+            <div id="colorHex"></div>
+        </div>
+        <div id="preview">
+            <h1 id="previewText">Please select a color to preview</h1>
+        </div>
+    </div>
+
+</body>
+<script>
+    var requestOptions = {
+        method: 'GET',
+    };
+
+    var colors;
+    fetch("http://color-names.herokuapp.com/v1/", requestOptions)
+        .then(response => (response.json()))
+        .then(data => colors = data)
+        .then(() => {
+            var body = document.getElementById("body")
+            var ul = document.getElementById("list");
+            var preview = document.getElementById('preview')
+            var previewTitle = document.getElementById('previewTitle')
+            var colorHex = document.getElementById('colorHex')
+            document.getElementById('loadingContainer').style.display = "none"
+            document.getElementById('preview').style.border = "1px solid black"
+            document.getElementById('previewText').style.display = "block"
+            colors.colors.forEach((color) => {
+                var li = document.createElement("li");
+                li.appendChild(document.createTextNode(color.name));
+                li.style.backgroundColor = color.hex
+                li.innerHTML = ""
+                li.addEventListener('click', function () {
+                    preview.style.backgroundColor = color.hex;
+                    previewTitle.innerHTML = color.name;
+                    colorHex.innerHTML = color.hex
+                    document.getElementById('previewText').style.display = "none"
+                })
+                ul.appendChild(li);
+            })
+        })
+        .catch(error => console.log('error', error))
+</script>
+</html>
